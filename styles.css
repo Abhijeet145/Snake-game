@@ -1,0 +1,33 @@
+body{
+            
+/*    background-image: url("image/body_bg.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;*/
+    /*background-position: center;*/
+    /*background-height:500px;*/
+background-color: rebeccapurple;
+    
+}
+.header{
+    text-decoration: bold;
+    background-color: #f1f1f1;
+    text-align: center;
+    display: inline-block;
+    width: 580px;
+    position:relative;
+}
+
+
+
+#mycanvas{
+	background-image: url("image/bg.png");
+    background-position: center;
+	border: 10px solid green;
+	background-size: contain; 
+    background-color: blueviolet;
+
+}
+
+
+/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 550px) 

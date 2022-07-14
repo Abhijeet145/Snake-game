@@ -1,3 +1,7 @@
+highscore = 0;
+prevscore = 0;
+start = true;
+drawHighScore = false;
 function Init(){
 
 	cankey = document.getElementById("canvaskeys");
@@ -6,7 +10,52 @@ function Init(){
 	keylen = 220;
 	keyheight = 95;
 	penkey = cankey.getContext('2d');
+	init ={
+		draw:function(){
+			// pen.clearRect(0,0,W,H);
+			pen.fillStyle = "yellow";
+			pen.font = "32px Roboto";
+			pen.fillText("Score :",4,32);
+			pen.fillText("High Score :",8*cs,32);
+			pen.fillText(highscore,12*cs+5,32);
 
+			//print the keypad
+			penkey.fillStyle = "green"; 
+			penkey.fillRect(175,100,keylen,keyheight);
+			penkey.fillRect(0,205,keylen,keyheight);
+			penkey.fillRect(350,205,keylen,keyheight);
+			penkey.fillRect(175,305,keylen,keyheight);
+			// print score and high score
+			if(drawHighScore==true)
+			{
+				pen.fillStyle = "yellow";
+				pen.font = "30px Roboto";
+				pen.fillText("Congratulations!",4.5*cs,4*cs-6);
+				pen.font = "20px Roboto";
+				pen.fillText("You have made a new high score",3.5*cs+5,5*cs-6);
+			}
+			
+			if(start==true)
+			{
+				document.removeEventListener('click',tostart);
+				pen.font = "25px Roboto";
+				pen.fillText("Click on Start",5*cs+13,5*cs-6);
+				pen.font = "60px Roboto";
+				pen.fillText("Start ",5.5*cs+3,17+8*cs);
+				start = false;
+			}
+			else
+			{
+				pen.font = "30px Roboto";
+				pen.fillText(prevscore,110,32);
+				pen.font = "60px Roboto";
+				pen.fillText("Restart ",5*cs-3,17+8*cs);
+				pen.font = "30px Roboto";
+
+			}
+
+		}
+	}
 
 	canvas = document.getElementById("mycanvas");
 	W = canvas.width = 560;
@@ -23,16 +72,11 @@ function Init(){
 	food_img = new Image();
 	food_img.src = "image/food.png";
 
-	//get an image to show score
-	star = new Image();
-	star.src = "image/star.png";
-
-
 	snake = {
-		intit_len:5,
-		color:"grey",
+		intit_len:3,
+		color:"mediumseagreen",
 		cells:[],
-		direction:"right",
+		direction:"none",
 		createSnake:function(){
 			for(var i = this.intit_len;i>0;i--){
 				this.cells.push({x:i,y:1});
@@ -40,19 +84,24 @@ function Init(){
 				
 		},
 		drawSnake: function(){
-			for (var i= 0;i< this.cells.length;i++ ){
+			
+			for (var i= 1;i< this.cells.length;i++ ){
 				pen.fillStyle = this.color;
 				pen.fillRect(this.cells[i].x*cs,this.cells[i].y*cs,cs-2,cs-2);
-			}		
+			}
+			pen.fillStyle = "red";
+				pen.fillRect(this.cells[0].x*cs,this.cells[0].y*cs,cs-2,cs-2);		
 		},
 		updateSnake: function(){
 			
 			var headX = this.cells[0].x;
 			var headY = this.cells[0].y;
+			
 			if(headX==food.x && headY==food.y)
 			{
 				food = getRandomFood();
 				score++;
+				prevscore = score;
 			}
 			else
 				this.cells.pop();
@@ -91,10 +140,18 @@ function Init(){
 		}
 	};
 
+	init.draw();
+
 	snake.createSnake();
+	document.addEventListener('click',tostart);
     document.addEventListener('keydown',updateDirection);
     cankey.addEventListener('click',updateDirection_key);
+    }
+
+function tostart(){
+	draw();
 }
+
 
 // function to test the functionality of keys
 function updateDirection_key(e){
@@ -121,33 +178,24 @@ function updateDirection_key(e){
 
 
 
+// main draw function
 function draw(){
 	//console.log("In draw");
-
-	//draw keys
-	penkey.fillStyle = "blue"; 
-	penkey.fillRect(175,100,keylen,keyheight);
-	penkey.fillRect(0,205,keylen,keyheight);
-	penkey.fillRect(350,205,keylen,keyheight);
-	penkey.fillRect(175,305,keylen,keyheight);
-
-
 
 	//erase the previous window
 	pen.clearRect(40,40,W,H);
 	snake.drawSnake();
 	food.drawFood();
-	
+
+	// show score and keep it changing
 	pen.clearRect(98,0,5*cs,cs);
-	//pen.drawImage(star,98,0,cs,cs);
-	pen.fillStyle = "yellow";
-	pen.font = "32px Roboto";
-	pen.fillText("Score :",4,32);
 
 	pen.fillStyle = "yellow";
 	pen.font = "30px Roboto";
 	pen.fillText(score,110,32);
+
 }
+
 function getRandomFood(){
 	var foodX = Math.round(Math.random()*(W-cs)/cs);
 	var foodY = Math.round(Math.random()*(H-cs)/cs);
@@ -186,24 +234,54 @@ function updateDirection(e){
 	{
 		snake.direction = "left";
 	}
+	else if(e.key == ' ')
+	{
+		snake.direction = "none";
+	}
+
 }
 function update(){
 	snake.updateSnake();
 
 }
 
+// main game loop
 function gameloop(){
 	//console.log("In gameloop");
 	if(game_over==true){
 		clearInterval(f);
-		alert("Game Over!");
+		if(score>highscore)
+		{
+			highscore = score;
+			drawHighScore=true;
+		}
+		else
+		{
+			drawHighScore=false;
+		}
+		document.addEventListener('keydown',restart);
+		document.addEventListener('click',restart);
+		Init();
 		return;
 	}
-	draw();
-	update();
+	if(snake.direction!="none")
+	{
+		
+		draw();
+		update();
+	}
 }
 
 Init();
-var f = setInterval(gameloop,250);
+
+
+function restart(){
+	document.removeEventListener('keydown',restart);
+	document.removeEventListener('click',restart);
+	Init();
+    draw();
+	f = setInterval(gameloop,250);
+}
+f = setInterval(gameloop,250);
 
 

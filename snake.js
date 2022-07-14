@@ -17,7 +17,7 @@ function Init(){
 			pen.font = "32px Roboto";
 			pen.fillText("Score :",4,32);
 			pen.fillText("High Score :",8*cs,32);
-			pen.fillText(highscore,12*cs+5,32);
+			pen.fillText(highscore,12*cs+8,32);
 
 			//print the keypad
 			penkey.fillStyle = "green"; 
@@ -280,8 +280,8 @@ function restart(){
 	document.removeEventListener('click',restart);
 	Init();
     draw();
-	f = setInterval(gameloop,250);
+	f = setInterval(gameloop,280);
 }
-f = setInterval(gameloop,250);
+f = setInterval(gameloop,280);
 
 

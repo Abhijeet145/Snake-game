@@ -2,8 +2,12 @@ highscore = 0;
 prevscore = 0;
 start = true;
 drawHighScore = false;
+const foodSound = new Audio('music/food.mp3');
+const gameOverSound = new Audio('music/gameover.mp3');
+const moveSound = new Audio('music/move.mp3');
+const musicSound = new Audio('music/music.mp3');
 function Init(){
-
+    
 	cankey = document.getElementById("canvaskeys");
 	cankey.width = 570;
 	cankey.height = 400;
@@ -17,7 +21,7 @@ function Init(){
 			pen.font = "32px Roboto";
 			pen.fillText("Score :",4,32);
 			pen.fillText("High Score :",8*cs,32);
-			pen.fillText(highscore,12*cs+8,32);
+			pen.fillText(highscore,12*cs+5,32);
 
 			//print the keypad
 			penkey.fillStyle = "green"; 
@@ -80,8 +84,7 @@ function Init(){
 		createSnake:function(){
 			for(var i = this.intit_len;i>0;i--){
 				this.cells.push({x:i,y:1});
-			}
-				
+			}	
 		},
 		drawSnake: function(){
 			
@@ -99,6 +102,7 @@ function Init(){
 			
 			if(headX==food.x && headY==food.y)
 			{
+				foodSound.play();
 				food = getRandomFood();
 				score++;
 				prevscore = score;
@@ -135,8 +139,19 @@ function Init(){
 			// logic to stop the snake from going out of the boundary
 			last_x = Math.round(W/cs)-2;
 			last_y = Math.round(H/cs)-2;
+			for(let i=1;i<this.cells.length;i++){
+				if((this.cells[i].x === this.cells[0].x) && (this.cells[i].y === this.cells[0].y)){
+					game_over=true;
+					gameOverSound.play();
+					musicSound.pause();
+				}
+			}
 			if(this.cells[0].x <1 || this.cells[0].y <1 || this.cells[0].x >last_x || this.cells[0].y>last_y)
+			{
 				game_over=true;
+				gameOverSound.play();
+				musicSound.pause();
+			}
 		}
 	};
 
@@ -150,6 +165,7 @@ function Init(){
 
 function tostart(){
 	draw();
+	musicSound.play();
 }
 
 
@@ -237,12 +253,13 @@ function updateDirection(e){
 	else if(e.key == ' ')
 	{
 		snake.direction = "none";
+		musicSound.pause();
 	}
 
 }
 function update(){
 	snake.updateSnake();
-
+	moveSound.play();
 }
 
 // main game loop
@@ -280,8 +297,8 @@ function restart(){
 	document.removeEventListener('click',restart);
 	Init();
     draw();
-	f = setInterval(gameloop,280);
+	f = setInterval(gameloop,250);
 }
-f = setInterval(gameloop,280);
+f = setInterval(gameloop,250);
 
 
